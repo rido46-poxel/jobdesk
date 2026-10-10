@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LokerKu - Portal Lowongan Kerja</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    /* ============ HEADER ============ */
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    header h1 { font-size: 22px; cursor: pointer; }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 14px;
+    }
+
+    /* ============ PAGE ============ */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .hero {
+      padding: 50px 8% 30px;
+      text-align: center;
+      background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    }
+
+    .hero h2 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+
+    .hero p { color: #475569; margin-bottom: 22px; }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .filters input { width: 420px; max-width: 100%; }
+
+    .filters input:focus,
+    .filters select:focus { border-color: #2563eb; }
+
+    main { padding: 30px 8% 60px; }
+
+    .job-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .job-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transition: 0.2s;
+      cursor: pointer;
+      border: 1px solid #e2e8f0;
+    }
+
+    .job-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    }
+
+    .job-card h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: #1e3a8a;
+    }
+
+    .company {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .salary {
+      font-weight: bold;
+      color: #059669;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .posted {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .empty {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 40px;
+      color: #64748b;
+    }
+
+    /* ============ MODAL DETAIL ============ */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      border-radius: 14px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #64748b;
+    }
+
+    .modal-content h2 { color: #1e3a8a; margin-bottom: 6px; }
+    .modal-content h4 { margin: 18px 0 8px; color: #334155; }
+    .modal-content ul { padding-left: 20px; color: #475569; }
+    .modal-content li { margin-bottom: 6px; }
+
+    .btn {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .btn:hover { background: #1d4ed8; }
+
+    /* ============ HALAMAN FORM LAMARAN ============ */
+    .apply-wrapper {
+      max-width: 780px;
+      margin: 30px auto 60px;
+      padding: 0 20px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #2563eb;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 18px;
+      font-weight: bold;
+      font-family: inherit;
+    }
+
+    .back-btn:hover { text-decoration: underline; }
+
+    .apply-header {
+      background: white;
+      border-radius: 14px 14px 0 0;
+      padding: 24px 28px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .apply-header h2 {
+      color: #1e3a8a;
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .apply-header .company { margin-bottom: 0; }
+
+    .apply-header .badges {
+      margin-top: 12px;
+      margin-bottom: 0;
+    }
+
+    .apply-form {
+      background: white;
+      border-radius: 0 0 14px 14px;
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .form-section-title {
+      font-size: 15px;
+      color: #1e3a8a;
+      font-weight: bold;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0f2fe;
+    }
+
+    .form-section { margin-bottom: 26px; }
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-group label .required { color: #dc2626; }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: 0.15s;
+      background: #fff;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-group input.error,
+    .form-group textarea.error,
+    .form-group select.error {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .error-msg {
+      display: none;
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .error-msg.show { display: block; }
+
+    .file-upload {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      background: #f8fafc;
+      display: block;
+    }
+
+    .file-upload:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .file-upload input { display: none; }
+
+    .file-upload .icon { font-size: 26px; margin-bottom: 6px; }
+
+    .file-upload .text {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .file-upload .text strong { color: #2563eb; }
+
+    .file-upload .file-name {
+      display: none;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #059669;
+      font-weight: bold;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .checkbox-group input {
+      margin-top: 3px;
+      width: 16px;
+      height: 16px;
+      accent-color: #2563eb;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-cancel { background: #e2e8f0; color: #334155; }
+    .btn-cancel:hover { background: #cbd5e1; }
+
+    .btn-submit { background: #059669; }
+    .btn-submit:hover { background: #047857; }
+
+    /* ============ TOAST ============ */
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #059669;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 90%;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ============ LOADING OVERLAY ============ */
+    .ad-loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(5px);
+      z-index: 500;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .ad-loading.active { display: flex; }
+
+    .ad-loading-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 26px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      animation: adPop 0.25s ease;
+    }
+
+    @keyframes adPop {
+      from { transform: scale(0.92); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .spinner {
+      width: 46px;
+      height: 46px;
+      border: 4px solid #dbeafe;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ad-loading-card h3 {
+      color: #1e3a8a;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .ad-loading-card p {
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .ad-countdown {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2563eb;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .ad-countdown-label {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .ad-progress {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 20px;
+      margin-top: 18px;
+      overflow: hidden;
+    }
+
+    .ad-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #3b82f6);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 10px; }
+      .hero h2 { font-size: 24px; }
+      .filters input { width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-actions { flex-direction: column-reverse; }
+      .form-actions .btn { width: 100%; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 onclick="goHome()">LokerKu</h1>
+    <nav>
+      <a href="#" onclick="goHome(); return false;">Beranda</a>
+      <a href="#">Lowongan</a>
+      <a href="#">Perusahaan</a>
+    </nav>
+  </header>
+
+  <!-- ================= HALAMAN 1: DAFTAR LOKER ================= -->
+  <section id="pageHome" class="page active">
+    <div class="hero">
+      <h2>Temukan Pekerjaan Impianmu</h2>
+      <p>Cari lowongan kerja terbaru sesuai posisi, perusahaan, dan lokasi.</p>
+      <div class="filters">
+        <input type="text" id="search" placeholder="Cari posisi, perusahaan, atau lokasi...">
+        <select id="category">
+          <option value="">Semua Kategori</option>
+          <option value="Teknologi">Teknologi</option>
+          <option value="Desain">Desain</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Keuangan">Keuangan</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+    </div>
+
+    <main>
+      <div class="job-grid" id="jobList"></div>
+    </main>
+  </section>
+
+  <!-- ================= HALAMAN 2: FORM LAMARAN ================= -->
+  <section id="pageApply" class="page">
+    <div class="apply-wrapper">
+      <button class="back-btn" onclick="goHome()">← Kembali ke daftar lowongan</button>
+
+      <div class="apply-header">
+        <h2 id="applyJobTitle">-</h2>
+        <div class="company" id="applyJobCompany">-</div>
+        <div class="badges" id="applyJobBadges"></div>
+      </div>
+
+      <form class="apply-form" id="applyForm" onsubmit="submitApplication(event)">
+        <div class="form-section">
+          <div class="form-section-title">📝 Data Diri</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nama Lengkap <span class="required">*</span></label>
+              <input type="text" id="nama" placeholder="Contoh: Budi Santoso">
+              <div class="error-msg" id="err-nama">Nama lengkap wajib diisi.</div>
+            </div>
+
+            <div class="form-group">
+              <label>Email <span class="required">*</span></label>
+              <input type="email" id="email" placeholder="nama@email.com">
+              <div class="error-msg" id="err-email">Email tidak valid.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>No. HP / WhatsApp <span class="required">*</span></label>
+              <input type="tel" id="phone" placeholder="0812xxxxxxx">
+              <div class="error-msg" id="err-phone">No. HP minimal 9 digit angka.</div>
+            </div>
+
+            <div class="form-group">
+              <label>Domisili <span class="required">*</span></label>
+              <input type="text" id="domisili" placeholder="Contoh: Jakarta Selatan">
+              <div class="error-msg" id="err-domisili">Domisili wajib diisi.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">💼 Pengalaman & Pendidikan</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pendidikan Terakhir <span class="required">*</span></label>
+              <select id="pendidikan">
+                <option value="">-- Pilih --</option>
+                <option>SMA / SMK</option>
+                <option>D3</option>
+                <option>S1</option>
+                <option>S2</option>
+              </select>
+              <div class="error-msg" id="err-pendidikan">Pendidikan wajib dipilih.</div>
+            </div>
+
+            <div class="form-group">
+              <label>Pengalaman Kerja <span class="required">*</span></label>
+              <select id="pengalaman">
+                <option value="">-- Pilih --</option>
+                <option>Fresh Graduate</option>
+                <option>Kurang dari 1 tahun</option>
+                <option>1 - 3 tahun</option>
+                <option>3 - 5 tahun</option>
+                <option>Lebih dari 5 tahun</option>
+              </select>
+              <div class="error-msg" id="err-pengalaman">Pengalaman wajib dipilih.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Keahlian / Skill <span class="required">*</span></label>
+            <input type="text" id="skill" placeholder="Contoh: HTML, CSS, JavaScript, React (pisahkan dengan koma)">
+            <div class="error-msg" id="err-skill">Keahlian wajib diisi.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Surat Lamaran / Perkenalan Singkat <span class="required">*</span></label>
+            <textarea id="cover" placeholder="Ceritakan singkat kenapa kamu cocok untuk posisi ini..."></textarea>
+            <div class="error-msg" id="err-cover">Surat lamaran minimal 30 karakter.</div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">📎 Berkas Lamaran</div>
+
+          <div class="form-group">
+            <label>Upload CV / Resume (PDF) <span class="required">*</span></label>
+            <label class="file-upload" for="cv">
+              <div class="icon">📄</div>
+              <div class="text">Klik untuk memilih file <strong>PDF</strong> atau drag & drop di sini</div>
+              <div class="file-name" id="cvName"></div>
+              <input type="file" id="cv" accept=".pdf">
+            </label>
+            <div class="error-msg" id="err-cv">File CV wajib diunggah (PDF).</div>
+          </div>
+
+          <div class="form-group">
+            <label>Portfolio / Link Tambahan (opsional)</label>
+            <input type="url" id="portfolio" placeholder="https://portfolio-kamu.com">
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="checkbox-group">
+            <input type="checkbox" id="agree">
+            <label for="agree" style="font-weight:normal; font-size:13px; cursor:pointer;">
+              Saya menyatakan bahwa data yang saya isi adalah benar dan menyetujui data ini digunakan untuk proses rekrutmen.
+            </label>
+          </div>
+          <div class="error-msg" id="err-agree">Kamu harus menyetujui pernyataan ini.</div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" onclick="goHome()">Batal</button>
+          <button type="submit" class="btn btn-submit">Kirim Lamaran</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= MODAL DETAIL ================= -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= LOADING OVERLAY ================= -->
+  <div class="ad-loading" id="adLoading">
+    <div class="ad-loading-card">
+      <div class="spinner"></div>
+      <h3>Membuka halaman sponsor</h3>
+      <p>Mohon tunggu sebentar ya 🙏</p>
+
+      <div class="ad-countdown" id="adCountdown">5</div>
+      <div class="ad-countdown-label">detik lagi</div>
+
+      <div class="ad-progress">
+        <div class="ad-progress-bar" id="adProgressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST ================= -->
+  <div class="toast" id="toast">✅ <span id="toastText">Lamaran berhasil dikirim!</span></div>
+
+  <script>
+    /* ============================================================
+       KONFIGURASI IKLAN — GANTI DI SINI
+       ============================================================ */
+    const AD_CONFIG = {
+      link: "https://omg10.com/4/10987615 ",  // ⬅️ GANTI dengan link iklanmu
+      delay: 10000,                          // 5 detik (dalam ms)
+      openInNewTab: true,                   // true = iklan di tab baru, form tetap lanjut
+      oncePerSession: false                 // true = iklan cuma muncul 1x per sesi
+    };
+    /* ============================================================ */
+
+
+    // ============ DATA LOKER ============
+    const jobs = [
+      {
+        id: 1,
+        title: "Frontend Developer",
+        company: "PT Digital Kreatif",
+        location: "Jakarta",
+        type: "Full-time",
+        category: "Teknologi",
+        salary: "Rp 8 - 12 juta",
+        posted: "2 hari lalu",
+        description: "Kami mencari Frontend Developer yang berpengalaman membuat tampilan website modern dan responsif.",
+        requirements: [
+          "Menguasai HTML, CSS, JavaScript",
+          "Familiar dengan React/Vue",
+          "Memahami Git dan API",
+          "Diutamakan berpengalaman 1 tahun"
+        ]
+      },
+      {
+        id: 2,
+        title: "UI/UX Designer",
+        company: "Studio Inovasi",
+        location: "Bandung",
+        type: "Full-time",
+        category: "Desain",
+        salary: "Rp 7 - 10 juta",
+        posted: "3 hari lalu",
+        description: "Bertanggung jawab merancang pengalaman pengguna aplikasi mobile dan web.",
+        requirements: [
+          "Menguasai Figma",
+          "Memahami design system",
+          "Bisa membuat wireframe dan prototype",
+          "Portfolio wajib dilampirkan"
+        ]
+      },
+      {
+        id: 3,
+        title: "Digital Marketing",
+        company: "Toko Online Jaya",
+        location: "Surabaya",
+        type: "Full-time",
+        category: "Marketing",
+        salary: "Rp 5 - 8 juta",
+        posted: "1 hari lalu",
+        description: "Mengelola campaign digital, media sosial, dan iklan online untuk meningkatkan penjualan.",
+        requirements: [
+          "Menguasai Facebook Ads & Google Ads",
+          "Bisa membuat konten copywriting",
+          "Memahami SEO/SEM",
+          "Kreatif dan update tren"
+        ]
+      },
+      {
+        id: 4,
+        title: "Staff Admin",
+        company: "CV Maju Bersama",
+        location: "Yogyakarta",
+        type: "Kontrak",
+        category: "Admin",
+        salary: "Rp 4 - 5 juta",
+        posted: "5 hari lalu",
+        description: "Membantu administrasi harian, pengarsipan dokumen, dan input data perusahaan.",
+        requirements: [
+          "Menguasai Microsoft Office",
+          "Teliti dan rapi",
+          "Bisa bekerja dalam tim",
+          "Diutamakan domisili Yogyakarta"
+        ]
+      },
+      {
+        id: 5,
+        title: "Backend Developer",
+        company: "PT Teknologi Nusantara",
+        location: "Remote",
+        type: "Full-time",
+        category: "Teknologi",
+        salary: "Rp 10 - 15 juta",
+        posted: "Baru saja",
+        description: "Membangun API dan sistem backend untuk aplikasi berskala besar.",
+        requirements: [
+          "Menguasai Node.js / Laravel / Go",
+          "Memahami database SQL & NoSQL",
+          "Pengalaman dengan REST API",
+          "Bisa bekerja remote"
+        ]
+      },
+      {
+        id: 6,
+        title: "Finance Staff",
+        company: "PT Sejahtera Abadi",
+        location: "Jakarta",
+        type: "Full-time",
+        category: "Keuangan",
+        salary: "Rp 6 - 9 juta",
+        posted: "4 hari lalu",
+        description: "Mengelola laporan keuangan, rekonsiliasi bank, dan administrasi pajak.",
+        requirements: [
+          "S1 Akuntansi",
+          "Menguasai Excel dan software akuntansi",
+          "Teliti dan jujur",
+          "Pengalaman 1 tahun diutamakan"
+        ]
+      }
+    ];
+
+    // ============ ELEMEN ============
+    const jobList = document.getElementById("jobList");
+    const searchInput = document.getElementById("search");
+    const categorySelect = document.getElementById("category");
+    const modal = document.getElementById("modal");
+    const modalBody = document.getElementById("modalBody");
+    const pageHome = document.getElementById("pageHome");
+    const pageApply = document.getElementById("pageApply");
+    const toast = document.getElementById("toast");
+    const toastText = document.getElementById("toastText");
+
+    let currentJob = null;
+
+    /* ============================================================
+       LOGIC IKLAN — AUTO BUKA + COUNTDOWN 5 DETIK
+       ============================================================ */
+    const adLoading     = document.getElementById("adLoading");
+    const adCountdown   = document.getElementById("adCountdown");
+    const adProgressBar = document.getElementById("adProgressBar");
+
+    let adTimerInterval = null;
+
+    function showAdGate(callback) {
+      // Kalau oncePerSession & sudah tampil → langsung lanjut
+      if (AD_CONFIG.oncePerSession && sessionStorage.getItem("adShown") === "1") {
+        if (callback) callback();
+        return;
+      }
+      sessionStorage.setItem("adShown", "1");
+
+      // Reset UI
+      const totalSeconds = Math.ceil(AD_CONFIG.delay / 1000);
+      let remaining = totalSeconds;
+
+      adCountdown.textContent = remaining;
+      adProgressBar.style.width = "0%";
+      adLoading.classList.add("active");
+
+      // Buka iklan di tab baru (langsung)
+      window.open(AD_CONFIG.link, "_blank", "noopener,noreferrer");
+
+      // Update progress bar tiap 50ms biar halus
+      const startTime = Date.now();
+
+      clearInterval(adTimerInterval);
+      adTimerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min((elapsed / AD_CONFIG.delay) * 100, 100);
+        adProgressBar.style.width = progress + "%";
+
+        const secondsLeft = Math.max(0, Math.ceil((AD_CONFIG.delay - elapsed) / 1000));
+        if (secondsLeft !== remaining) {
+          remaining = secondsLeft;
+          adCountdown.textContent = remaining;
+        }
+
+        if (elapsed >= AD_CONFIG.delay) {
+          clearInterval(adTimerInterval);
+
+          // Tutup overlay & buka form
+          adLoading.classList.remove("active");
+          if (callback) callback();
+        }
+      }, 50);
+    }
+    /* ============================================================ */
+
+
+    // ============ RENDER LIST LOKER ============
+    function renderJobs() {
+      const keyword = searchInput.value.toLowerCase();
+      const category = categorySelect.value;
+
+      const filtered = jobs.filter(job => {
+        const matchSearch =
+          job.title.toLowerCase().includes(keyword) ||
+          job.company.toLowerCase().includes(keyword) ||
+          job.location.toLowerCase().includes(keyword);
+        const matchCategory = category === "" || job.category === category;
+        return matchSearch && matchCategory;
+      });
+
+      if (filtered.length === 0) {
+        jobList.innerHTML = `<div class="empty">Tidak ada lowongan yang cocok.</div>`;
+        return;
+      }
+
+      jobList.innerHTML = filtered.map(job => `
+        <div class="job-card" onclick="openModal(${job.id})">
+          <h3>${job.title}</h3>
+          <div class="company">${job.company} • ${job.location}</div>
+          <div class="badges">
+            <span class="badge">${job.type}</span>
+            <span class="badge">${job.category}</span>
+          </div>
+          <div class="salary">${job.salary}</div>
+          <div class="posted">${job.posted}</div>
+        </div>
+      `).join("");
+    }
+
+    // ============ MODAL DETAIL ============
+    function openModal(id) {
+      const job = jobs.find(item => item.id === id);
+      if (!job) return;
+      currentJob = job;
+
+      modalBody.innerHTML = `
+        <h2>${job.title}</h2>
+        <div class="company">${job.company} • ${job.location}</div>
+        <div class="badges">
+          <span class="badge">${job.type}</span>
+          <span class="badge">${job.category}</span>
+        </div>
+        <div class="salary">${job.salary}</div>
+        <p style="margin-top:14px; color:#475569;">${job.description}</p>
+
+        <h4>Kualifikasi:</h4>
+        <ul>
+          ${job.requirements.map(req => `<li>${req}</li>`).join("")}
+        </ul>
+
+        <button class="btn" onclick="goToApply(${job.id})">Lamar Sekarang</button>
+      `;
+      modal.classList.add("active");
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+    }
+
+    modal.addEventListener("click", e => {
+      if (e.target === modal) closeModal();
+    });
+
+    // ============ NAVIGASI ============
+    function goToApply(jobId) {
+      showAdGate(() => openApplyForm(jobId));
+    }
+
+    function openApplyForm(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      document.getElementById("applyJobTitle").textContent = job.title;
+      document.getElementById("applyJobCompany").textContent = `${job.company} • ${job.location}`;
+      document.getElementById("applyJobBadges").innerHTML = `
+        <span class="badge">${job.type}</span>
+        <span class="badge">${job.category}</span>
+        <span class="badge">${job.salary}</span>
+      `;
+
+      document.getElementById("applyForm").reset();
+      document.getElementById("cvName").style.display = "none";
+      document.querySelectorAll(".error-msg").forEach(el => el.classList.remove("show"));
+      document.querySelectorAll("input, textarea, select").forEach(el => el.classList.remove("error"));
+
+      closeModal();
+      pageHome.classList.remove("active");
+      pageApply.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goHome() {
+      pageApply.classList.remove("active");
+      pageHome.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ============ TAMPILKAN NAMA FILE CV ============
+    document.getElementById("cv").addEventListener("change", function () {
+      const nameEl = document.getElementById("cvName");
+      if (this.files.length > 0) {
+        nameEl.textContent = "✓ " + this.files[0].name;
+        nameEl.style.display = "block";
+      } else {
+        nameEl.style.display = "none";
+      }
+    });
+
+    // ============ VALIDASI & SUBMIT ============
+    function submitApplication(e) {
+      e.preventDefault();
+
+      const fields = [
+        { id: "nama", err: "err-nama", validate: v => v.trim().length >= 2 },
+        { id: "email", err: "err-email", validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+        { id: "phone", err: "err-phone", validate: v => /^[0-9+\-\s]{9,}$/.test(v) },
+        { id: "domisili", err: "err-domisili", validate: v => v.trim().length >= 2 },
+        { id: "pendidikan", err: "err-pendidikan", validate: v => v !== "" },
+        { id: "pengalaman", err: "err-pengalaman", validate: v => v !== "" },
+        { id: "skill", err: "err-skill", validate: v => v.trim().length >= 2 },
+        { id: "cover", err: "err-cover", validate: v => v.trim().length >= 30 }
+      ];
+
+      let valid = true;
+      let firstErrorEl = null;
+
+      fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const errEl = document.getElementById(f.err);
+        if (!f.validate(el.value)) {
+          el.classList.add("error");
+          errEl.classList.add("show");
+          valid = false;
+          if (!firstErrorEl) firstErrorEl = el;
+        } else {
+          el.classList.remove("error");
+          errEl.classList.remove("show");
+        }
+      });
+
+      const cv = document.getElementById("cv");
+      const errCv = document.getElementById("err-cv");
+      if (!cv.files.length) {
+        errCv.classList.add("show");
+        valid = false;
+        if (!firstErrorEl) firstErrorEl = document.getElementById("cv");
+      } else {
+        errCv.classList.remove("show");
+      }
+
+      const agree = document.getElementById("agree");
+      const errAgree = document.getElementById("err-agree");
+      if (!agree.checked) {
+        errAgree.classList.add("show");
+        valid = false;
+      } else {
+        errAgree.classList.remove("show");
+      }
+
+      if (!valid) {
+        if (firstErrorEl) {
+          firstErrorEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (firstErrorEl.focus) firstErrorEl.focus();
+        }
+        return;
+      }
+
+      // Valid → kirim lamaran
+      const nama = document.getElementById("nama").value;
+      const jobTitle = document.getElementById("applyJobTitle").textContent;
+      const company = document.getElementById("applyJobCompany").textContent.split("•")[0].trim();
+
+      showToast(`Lamaran untuk "${jobTitle}" di ${company} berhasil dikirim, ${nama}!`);
+
+      document.getElementById("applyForm").reset();
+      document.getElementById("cvName").style.display = "none";
+      setTimeout(goHome, 1800);
+    }
+
+    // ============ TOAST ============
+    function showToast(message) {
+      toastText.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 4000);
+    }
+
+    // ============ EVENT LISTENER ============
+    searchInput.addEventListener("input", renderJobs);
+    categorySelect.addEventListener("change", renderJobs);
+
+    renderJobs();
+  </script>
+
+</body>
+</html>
